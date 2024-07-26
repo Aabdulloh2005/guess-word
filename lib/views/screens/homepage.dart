@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:mini_quiz/controllers/getx_word_controller.dart';
 
 class Homepage extends StatelessWidget {
-  Homepage({super.key});
+  Homepage({super.key}) {
+    wordController.generateShuffledLetters();
+  }
 
   final wordController = Get.put(GetxWordController());
 
@@ -12,33 +14,40 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Guess the word"),
+        title: const Text("Guess the word by photo"),
       ),
       body: Obx(() {
         if (wordController.words.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: Text(
+            "Congratulations! You've completed the game.",
+            style: TextStyle(color: Colors.blue, fontSize: 24),
+          ));
         }
         if (wordController.userWord.join() == wordController.words[0].word) {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("dsdsdsdsdsds"),
-              );
-            },
-          );
+          Future.delayed(Duration.zero, () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Correct!"),
+                  content: const Text("You guessed the word!"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        wordController.nextWord();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Next Word"),
+                    ),
+                  ],
+                );
+              },
+            );
+          });
         }
 
         final word = wordController.words[0].word;
-        List<String> letters = word.characters.toList();
-        if (letters.length < 12) {
-          letters.addAll(List.generate(
-            12 - letters.length,
-            (_) => characters[Random().nextInt(characters.length)],
-          ));
-        }
-        letters.shuffle();
-
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -79,20 +88,29 @@ class Homepage extends StatelessWidget {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Center(
-                        child: Obx(() {
-                          return Text(
-                            wordController.userWord.length > index
-                                ? wordController.userWord[index].toString()
-                                : '',
-                          );
-                        }),
+                    return GestureDetector(
+                      onTap: () {
+                        if (index < wordController.userWord.length) {
+                          wordController.removeCharacter(index);
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Center(
+                          child: Obx(() {
+                            return Text(
+                              wordController.userWord.length > index
+                                  ? wordController.userWord[index].toString()
+                                  : '',
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            );
+                          }),
+                        ),
                       ),
                     );
                   },
@@ -112,7 +130,8 @@ class Homepage extends StatelessWidget {
                       onTap: () {
                         if (wordController.userWord.length <
                             wordController.words[0].word.length) {
-                          wordController.addCharacter(letters[index]);
+                          wordController.addCharacter(
+                              wordController.shuffledLetters[index]);
                         }
                       },
                       child: Container(
@@ -123,10 +142,16 @@ class Homepage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Center(
-                          child: Text(
-                            letters[index],
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                          child: Obx(() {
+                            return Text(
+                              wordController.shuffledLetters[index],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            );
+                          }),
                         ),
                       ),
                     );

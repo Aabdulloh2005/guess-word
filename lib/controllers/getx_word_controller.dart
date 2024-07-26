@@ -1,13 +1,16 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/word.dart';
 
 class GetxWordController extends GetxController {
-  RxList<String> userWord = <String>[].obs; // Initial bo'sh ro'yxat
+  RxList<String> userWord = <String>[].obs; // Initial empty list
+  RxList<String> shuffledLetters = <String>[].obs; // Store shuffled letters
 
   void addCharacter(String character) {
     userWord.add(character);
-    print(userWord);
   }
 
   void removeCharacter(int index) {
@@ -29,54 +32,50 @@ class GetxWordController extends GetxController {
     ),
     Word(
       image:
-          "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/6/26.webp?v=1682812404",
-      word: "сезоны",
+          "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/5/37.webp?v=1682812404",
+      word: "песок",
     ),
     Word(
       image:
-          "https://bygame.ru/uploads/ai/4-fotки-1-slово-new/6/41.webp?v=1682812404",
-      word: "баланс",
+          "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/5/53.webp?v=1682812404",
+      word: "синий",
     ),
     Word(
       image:
-          "https://bygame.ru/uploads/ai/4-fotки-1-slово-new/6/43.webp?v=1682812404",
-      word: "ломтик",
+          "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/5/66.webp?v=1682812404",
+      word: "холод",
+    ),
+    Word(
+      image:
+          "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/6/57.webp?v=1682812404",
+      word: "ловить",
     ),
   ].obs;
-}
 
-List<String> characters = [
-  'ё',
-  'й',
-  'ц',
-  'у',
-  'к',
-  'е',
-  'н',
-  'г',
-  'ш',
-  'щ',
-  'з',
-  'х',
-  'ъ',
-  'ф',
-  'ы',
-  'в',
-  'а',
-  'п',
-  'р',
-  'о',
-  'л',
-  'д',
-  'ж',
-  'э',
-  'я',
-  'ч',
-  'с',
-  'м',
-  'и',
-  'т',
-  'ь',
-  'б',
-  'ю',
-];
+  void resetUserWord() {
+    userWord.clear();
+  }
+
+  void nextWord() {
+    if (words.isNotEmpty) {
+      words.removeAt(0);
+      resetUserWord();
+      generateShuffledLetters();
+    }
+  }
+
+  void generateShuffledLetters() {
+    if (words.isNotEmpty) {
+      final word = words[0].word;
+      List<String> letters = word.characters.toList();
+      if (letters.length < 12) {
+        letters.addAll(List.generate(
+          12 - letters.length,
+          (_) => characters[Random().nextInt(characters.length)],
+        ));
+      }
+      letters.shuffle();
+      shuffledLetters.assignAll(letters);
+    }
+  }
+}
