@@ -1,8 +1,9 @@
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
-import 'package:mini_quiz/views/screens/homepage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_quiz/bloc/word_bloc.dart';
+import 'views/screens/homepage.dart';
 
-void main(List<String> args) {
+void main() {
   runApp(const MainRunner());
 }
 
@@ -11,9 +12,12 @@ class MainRunner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Homepage(),
+    return BlocProvider(
+      create: (context) => WordBloc(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Homepage(),
+      ),
     );
   }
 }
