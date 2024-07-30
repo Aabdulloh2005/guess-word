@@ -48,10 +48,7 @@ void main() {
       expect(wordCubit.state.userWord, ['а']);
     });
 
-    test('tekshrish', () {
-      print(wordCubit.state.userWord);
-      
-    });
+    
 
     test('harflarni aralashtirish', () {
       wordCubit.shuffleLetters();
