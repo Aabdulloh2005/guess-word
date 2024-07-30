@@ -1,69 +1,61 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mini_quiz/bloc/word_bloc.dart';
-import 'package:mini_quiz/models/word.dart';
-import 'package:mini_quiz/views/screens/homepage.dart';
-
-class MockWordBloc extends MockBloc<WordEvent, WordState> implements WordBloc {}
+import 'package:mini_quiz/bloc/word_cubit.dart';
 
 void main() {
-  group('Homepage Widget', () {
-    late WordBloc wordBloc;
+  group('WordCubit', () {
+    late WordCubit wordCubit;
 
     setUp(() {
-      wordBloc = MockWordBloc();
+      wordCubit = WordCubit();
     });
 
     tearDown(() {
-      wordBloc.close();
+      wordCubit.close();
     });
 
-    testWidgets('has one image, one text, and buttons', (WidgetTester tester) async {
-      whenListen(
-        wordBloc,
-        Stream<WordState>.fromIterable([
-          WordState(
-            words: [
-              Word(
-                image: "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/6/1.webp?v=1682812404",
-                word: "музыка",
-              ),
-            ],
-            shuffledLetters: List<String>.generate(12, (index) => 'a'),
-          ),
-        ]),
-        initialState: WordState(
-          words: [
-            Word(
-              image: "https://bygame.ru/uploads/ai/4-fotki-1-slovo-new/6/1.webp?v=1682812404",
-              word: "музыка",
-            ),
-          ],
-          shuffledLetters: List<String>.generate(12, (index) => 'a'),
-        ),
-      );
+    test('harf bosildi m', () {
+      wordCubit.addCharacter('м');
+      expect(wordCubit.state.userWord, ['м']);
+    });
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<WordBloc>(
-            create: (_) => wordBloc,
-            child: const Homepage(),
-          ),
-        ),
-      );
+    test('harf bosildi u', () {
+      wordCubit.addCharacter('у');
+      expect(wordCubit.state.userWord, ['у']);
+    });
+    test('harf bosildi z', () {
+      wordCubit.addCharacter('з');
+      expect(wordCubit.state.userWord, ['з']);
+    });
+    test('harf bosildi  i', () {
+      wordCubit.addCharacter('ы');
+      expect(wordCubit.state.userWord, ['ы']);
+    });
+    test('harf ochirildi ы', () {
+      wordCubit.addCharacter('ы');
+      wordCubit.removeCharacter(3);
+      expect(wordCubit.state.userWord, ['ы']);
+    });
+    test('harf bosildi ы ', () {
+      wordCubit.addCharacter('ы');
+      expect(wordCubit.state.userWord, ['ы']);
+    });
+    test('harf bosildi k', () {
+      wordCubit.addCharacter('к');
+      expect(wordCubit.state.userWord, ['к']);
+    });
+    test('harf bosildi a', () {
+      wordCubit.addCharacter('а');
+      expect(wordCubit.state.userWord, ['а']);
+    });
 
-      await tester.pumpAndSettle();
+    test('tekshrish', () {
+      print(wordCubit.state.userWord);
+      
+    });
 
-      // Check for image
-      expect(find.byType(Image), findsOneWidget);
-
-      // Check for text
-      expect(find.byType(Text), findsWidgets);
-
-      // Check for buttons
-      expect(find.byType(GestureDetector), findsWidgets);
+    test('harflarni aralashtirish', () {
+      wordCubit.shuffleLetters();
+      expect(wordCubit.state.shuffledLetters, hasLength(12));
     });
   });
 }

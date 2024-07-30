@@ -1,4 +1,4 @@
-part of 'word_bloc.dart';
+import 'package:mini_quiz/models/word.dart';
 
 class WordState {
   final List<String> userWord;

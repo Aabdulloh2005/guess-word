@@ -1,24 +1,15 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_quiz/bloc/word_state.dart';
 import '../models/word.dart';
 
-part 'word_event.dart';
-part 'word_state.dart';
-
-class WordBloc extends Bloc<WordEvent, WordState> {
-  WordBloc() : super(const WordState()) {
-    on<LoadWords>(_onLoadWords);
-    on<AddCharacter>(_onAddCharacter);
-    on<RemoveCharacter>(_onRemoveCharacter);
-    on<NextWord>(_onNextWord);
-    on<ShuffleLetters>(_onShuffleLetters);
-
-    // Initial load
-    add(LoadWords());
+class WordCubit extends Cubit<WordState> {
+  WordCubit() : super(const WordState()) {
+    loadWords();
   }
 
-  void _onLoadWords(LoadWords event, Emitter<WordState> emit) {
+  void loadWords() {
     List<Word> words = [
       Word(
           image:
@@ -47,83 +38,43 @@ class WordBloc extends Bloc<WordEvent, WordState> {
     ];
 
     emit(state.copyWith(words: words));
-    add(ShuffleLetters());
+    shuffleLetters();
   }
 
-  void _onAddCharacter(AddCharacter event, Emitter<WordState> emit) {
-    List<String> updatedUserWord = List.from(state.userWord)
-      ..add(event.character);
+  void addCharacter(String character) {
+    List<String> updatedUserWord = List.from(state.userWord)..add(character);
     emit(state.copyWith(userWord: updatedUserWord));
   }
 
-  void _onRemoveCharacter(RemoveCharacter event, Emitter<WordState> emit) {
-    if (state.userWord.isNotEmpty && event.index < state.userWord.length) {
-      List<String> updatedUserWord = List.from(state.userWord)
-        ..removeAt(event.index);
+  void removeCharacter(int index) {
+    if (state.userWord.isNotEmpty && index < state.userWord.length) {
+      List<String> updatedUserWord = List.from(state.userWord)..removeAt(index);
       emit(state.copyWith(userWord: updatedUserWord));
     }
   }
 
-  void _onNextWord(NextWord event, Emitter<WordState> emit) {
+  void nextWord() {
     if (state.words.isNotEmpty) {
       List<Word> updatedWords = List.from(state.words)..removeAt(0);
       emit(state.copyWith(
           words: updatedWords, userWord: [], completed: updatedWords.isEmpty));
 
       if (updatedWords.isNotEmpty) {
-        add(ShuffleLetters());
+        shuffleLetters();
       }
     }
   }
 
-  void _onShuffleLetters(ShuffleLetters event, Emitter<WordState> emit) {
+  void shuffleLetters() {
     if (state.words.isNotEmpty) {
       final word = state.words[0].word;
       List<String> letters = word.characters.toList();
       if (letters.length < 12) {
-        letters.addAll(List.generate(
-          12 - letters.length,
-          (_) => characters[Random().nextInt(characters.length)],
-        ));
+        letters.addAll(List.generate(12 - letters.length,
+            (_) => characters[Random().nextInt(characters.length)]));
       }
       letters.shuffle();
       emit(state.copyWith(shuffledLetters: letters));
     }
   }
 }
-
-List<String> characters = [
-  'ё',
-  'й',
-  'ц',
-  'у',
-  'к',
-  'е',
-  'н',
-  'г',
-  'ш',
-  'щ',
-  'з',
-  'х',
-  'ъ',
-  'ф',
-  'ы',
-  'в',
-  'а',
-  'п',
-  'р',
-  'о',
-  'л',
-  'д',
-  'ж',
-  'э',
-  'я',
-  'ч',
-  'с',
-  'м',
-  'и',
-  'т',
-  'ь',
-  'б',
-  'ю',
-];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mini_quiz/bloc/word_bloc.dart';
+import 'package:mini_quiz/bloc/word_cubit.dart';
+import 'package:mini_quiz/bloc/word_state.dart';
 
 class Homepage extends StatelessWidget {
   const Homepage({super.key});
@@ -11,9 +12,10 @@ class Homepage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Guess the word by photo"),
       ),
-      body: BlocConsumer<WordBloc, WordState>(
+      body: BlocConsumer<WordCubit, WordState>(
         listener: (context, state) {
-          if (state.words.isNotEmpty && state.userWord.join() == state.words[0].word) {
+          if (state.words.isNotEmpty &&
+              state.userWord.join() == state.words[0].word) {
             Future.delayed(Duration.zero, () {
               showDialog(
                 context: context,
@@ -24,7 +26,7 @@ class Homepage extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          context.read<WordBloc>().add(NextWord());
+                          context.read<WordCubit>().nextWord();
                           Navigator.of(context).pop();
                         },
                         child: const Text("Next Word"),
@@ -45,13 +47,13 @@ class Homepage extends StatelessWidget {
               ),
             );
           }
-      
+
           if (state.words.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-      
+
           final word = state.words[0].word;
           return CustomScrollView(
             slivers: [
@@ -96,7 +98,7 @@ class Homepage extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           if (index < state.userWord.length) {
-                            context.read<WordBloc>().add(RemoveCharacter(index));
+                            context.read<WordCubit>().removeCharacter(index);
                           }
                         },
                         child: Container(
@@ -131,8 +133,11 @@ class Homepage extends StatelessWidget {
                     (context, index) {
                       return GestureDetector(
                         onTap: () {
-                          if (state.userWord.length < state.words[0].word.length) {
-                            context.read<WordBloc>().add(AddCharacter(state.shuffledLetters[index]));
+                          if (state.userWord.length <
+                              state.words[0].word.length) {
+                            context
+                                .read<WordCubit>()
+                                .addCharacter(state.shuffledLetters[index]);
                           }
                         },
                         child: Container(
