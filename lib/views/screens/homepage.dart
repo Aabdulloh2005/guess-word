@@ -16,26 +16,24 @@ class Homepage extends StatelessWidget {
         listener: (context, state) {
           if (state.words.isNotEmpty &&
               state.userWord.join() == state.words[0].word) {
-            Future.delayed(Duration.zero, () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Correct!"),
-                    content: const Text("You guessed the word!"),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          context.read<WordCubit>().nextWord();
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Next Word"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            });
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Correct!"),
+                  content: const Text("You guessed the word!"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        context.read<WordCubit>().nextWord();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Next Word"),
+                    ),
+                  ],
+                );
+              },
+            );
           }
         },
         builder: (context, state) {
